@@ -1,6 +1,6 @@
 <?php
 
-Route::any(Config::get('swaggervel.doc-route').'/{page?}', function($page='api-docs.json') {
+Route::any(Config::get('swaggervel.doc-route').'/{page?}', function ($page='api-docs.json') {
     $filePath = Config::get('swaggervel.doc-dir') . "/{$page}";
 
     if (File::extension($filePath) === "") {
@@ -11,12 +11,12 @@ Route::any(Config::get('swaggervel.doc-route').'/{page?}', function($page='api-d
     }
 
     $content = File::get($filePath);
-    return Response::make($content, 200, array(
+    return Response::make($content, 200, [
         'Content-Type' => 'application/json'
-    ));
+    ]);
 });
 
-Route::get(Config::get('swaggervel.api-docs-route'), function() {
+Route::get(Config::get('swaggervel.api-docs-route'), function () {
     if (Config::get('swaggervel.generateAlways')) {
         $appDir = base_path()."/".Config::get('swaggervel.app-dir');
         $docDir = Config::get('swaggervel.doc-dir');
@@ -45,14 +45,16 @@ Route::get(Config::get('swaggervel.api-docs-route'), function() {
 
     if (Config::get('swaggervel.behind-reverse-proxy')) {
         $proxy = Request::server('REMOTE_ADDR');
-        Request::setTrustedProxies(array($proxy));
+        Request::setTrustedProxies([$proxy]);
     }
 
-    Blade::setEscapedContentTags('{{{', '}}}');
-    Blade::setContentTags('{{', '}}');
+    // Blade::setEscapedContentTags('{{{', '}}}');
+    // Blade::setContentTags('{{', '}}');
 
     //need the / at the end to avoid CORS errors on Homestead systems.
-    $response = response()->view('swaggervel::index', array(
+    $response = response()->view(
+        'swaggervel::index',
+        [
         'secure'         => Request::secure(),
         'urlToDocs'      => url(Config::get('swaggervel.doc-route')),
         'requestHeaders' => Config::get('swaggervel.requestHeaders'),
@@ -60,7 +62,7 @@ Route::get(Config::get('swaggervel.api-docs-route'), function() {
         'clientSecret'   => Request::input("client_secret"),
         'realm'          => Request::input("realm"),
         'appName'        => Request::input("appName"),
-        )
+        ]
     );
 
     //need the / at the end to avoid CORS errors on Homestead systems.
